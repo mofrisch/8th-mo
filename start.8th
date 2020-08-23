@@ -1,5 +1,6 @@
 needs console/loaded
 with: con
-
-white onBlack cls
+"white onBlack" normalAttr !
+normal
+cls
 

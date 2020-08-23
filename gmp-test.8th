@@ -1,0 +1,12 @@
+needs math/gmp
+with: gmp
+
+var a
+var b 
+"abc" . cr
+"10" bi:set .s
+"20" bi:set .s
+bi:+ .s
+\ bi:++
+bi:get .s
+.
