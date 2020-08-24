@@ -1,0 +1,45 @@
+: f. \ f n --
+   \ true e# 
+
+   18 <# . " |" . cr ;
+
+: ld \ n -- n
+   n:ln 10 n:ln n:/ ;
+
+: f-show \ f --
+   1. n:* dup dup >r 0 n:< if n:neg then 
+   ld   dup 0 < if 0 then   n:floor n:int dup 0 = if r> . "e" . . else dup r> swap 10 * n:/ . "e" . . then ;
+   
+    
+\ true e#
+1 f.
+1.1 f.
+-1.1 f.
+
+1000.1 f.
+1.23456789e100 f.
+1.23456789e200 f.
+F1.23456789e999 f.
+F1.23456789e1000 f.
+F1.23456789e-1000 f.
+cr
+1.1 . cr
+F1.1 . cr
+-1.1 . cr
+F-1.1 . cr
+1.1e100 . cr
+F1.1e100 . cr
+1.1e-100 . cr
+F1.1e-100 . cr
+1.1e30 >s
+1.1 >s
+.s
+1.1 f-show cr
+11. f-show cr
+0 f-show cr
+1 f-show cr
+-1.1 f-show cr
+-11 f-show cr
+1.1e-5 f-show cr 
+
+

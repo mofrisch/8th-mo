@@ -1,0 +1,23 @@
+\ vim: ft=8th:
+\ common numeric words
+
+var max-iterations   1000 max-iterations !
+var num-debug   false num-debug !
+var epsilon
+
+: eps \ -- n
+   epsilon @ ;
+
+: eps! \ n --
+   epsilon ! ;
+
+: short_floats \ --
+   16 ## 1e-15 eps! ;
+
+: big_floats \ n --
+   dup n:1+ dup n# ## F10 swap n:neg n:^ eps! ;
+
+defer: f
+
+
+

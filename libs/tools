@@ -1,0 +1,29 @@
+\ vim: ft=8th:
+\ common tools
+
+: draw-line \ n --
+   ( "-" . ) swap times ;
+
+: 2r> \ -- r1 r2
+   r> r> ;
+
+: 2>r \ r1 r2 --
+   >r >r ;
+
+: >= \ n1 n2 -- ?
+   n:< not ;
+
+: <= \ n1 n2 -- ?
+   n:> not ;
+
+: <> \ n1 n2 -- ?
+   n:= not ;
+
+: f~ \ f1 f2 eps > 0 -- ?
+   -rot n:- n:abs swap n:< ;
+
+: f. \ f --
+   true e# 
+   dup 0 >= if " " . then
+   . " " . 
+   false e# ;

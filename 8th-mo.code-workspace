@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../8th"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}
