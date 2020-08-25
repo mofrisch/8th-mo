@@ -3,7 +3,7 @@ needs tools
 
 var f(a)
 
-: f_test \ n -- n
+: f-test \ n -- n
    \ f(x)=x^3+4x^2-10
    dup >r 4 n:+ r@ n:* r> n:* 10 n:- ;
 
@@ -11,41 +11,52 @@ var f(a)
    over n:- 2 n:/ n:+ ; 
 
 : print-row \ n a b p f(p) -- n a b p f(p)
-   4 pick 4 #> . " " .
+   4 #> 4 pick . " " . 
    3 pick f. " " .
    2 pick f. " " .
    1 pick f. " " .
-   0 pick f. 
-   3 pick 2 pick n:- n:abs f. cr ;
+   0 pick f. " " .
+   3 pick 2 pick n:- n:abs f. 
+   cr ;
 
-: criterion \ b p f(p) -- b p f(p) ?
-   dup 0 eps f~ >r  
+: criterion \ n b p f(p) -- n b p f(p) ?
+   dup 0 eps f~ >r 
    -rot 2dup eps f~ >r rot 
    2r> or ;
 
-: next-interval \ a b n -- a p | p b
-   -rot 2dup midpoint dup f 
-   criterion if break then
+: crit \ n a b -- n a b ?
+   f(a) @ 0 eps f~ >r \ n a b
+   2dup eps f~ r> \ n ? a b ?
+   or ;
+
+: next-interval \ a b n --  a p | p b
+   dup 11 = if ;; then
+   -rot 2dup midpoint dup f \ n a b p f(p)
    num-debug @ if print-row then
-   f(a) @ over n:* 0 n:> if f(a) ! rot drop swap
-   else drop nip then 
-   rot drop ;
+   f(a) @ over n:* 0 n:> if \ n a b p f(p) f(a)*f(p)>0
+      f(a) ! rot drop swap \ n a b p 
+   else 
+      drop nip \ n a b 
+   then 
+   crit if rot break else
+   rot drop then ; 
 
 : bisection \ a b -- p
    over f f(a) ! 
    num-debug @ if
-   "n     a                       b                       p                       f(p) " . cr
-   102 draw-line cr
+   "n     a                       b                       p                       f(p)                    |a-b| " . cr
+   124 draw-line cr
    then
-   ' next-interval 1 max-iterations @ loop ;
+   ' next-interval 1 11 loop 11 n:= if
+   "ran " . 10 . " iterations, but result was not close enough" . cr then ;
 
-\ true num-debug !
-\ short_floats
-40 big_floats
-' f_test w:is f
-F1. F2. bisection nip . cr
-: word ( before -- after ) \ description
-   definition ;
+true num-debug !
+short-floats
+
+\ 40 big-floats
+1e-15 eps!
+' f-test w:is f
+1. 2. bisection f. cr
 
 
 

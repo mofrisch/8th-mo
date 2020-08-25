@@ -22,8 +22,3 @@
 : f~ \ f1 f2 eps > 0 -- ?
    -rot n:- n:abs swap n:< ;
 
-: f. \ f --
-   true e# 
-   dup 0 >= if " " . then
-   . " " . 
-   false e# ;

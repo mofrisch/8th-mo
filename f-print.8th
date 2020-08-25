@@ -1,45 +1,30 @@
-: f. \ f n --
-   \ true e# 
-
-   18 <# . " |" . cr ;
-
-: ld \ n -- n
-   n:ln 10 n:ln n:/ ;
-
-: f-show \ f --
-   1. n:* dup dup >r 0 n:< if n:neg then 
-   ld   dup 0 < if 0 then   n:floor n:int dup 0 = if r> . "e" . . else dup r> swap 10 * n:/ . "e" . . then ;
-   
-    
-\ true e#
-1 f.
-1.1 f.
--1.1 f.
-
-1000.1 f.
-1.23456789e100 f.
-1.23456789e200 f.
-F1.23456789e999 f.
-F1.23456789e1000 f.
-F1.23456789e-1000 f.
-cr
-1.1 . cr
-F1.1 . cr
--1.1 . cr
-F-1.1 . cr
-1.1e100 . cr
-F1.1e100 . cr
-1.1e-100 . cr
-F1.1e-100 . cr
-1.1e30 >s
-1.1 >s
+needs numerics
+short-floats
+0 f. "|" . cr   .s
+0.0 f. "|" . cr
+1 f. "|" . cr
+11 f. "|" . cr
+10e3 f. "|" . cr
 .s
-1.1 f-show cr
-11. f-show cr
-0 f-show cr
-1 f-show cr
--1.1 f-show cr
--11 f-show cr
-1.1e-5 f-show cr 
+10e15 f. "|" . cr
+10e17 f. "|" . cr
+10e25 f. "|" . cr
+-1 f. "|" . cr
+-11 f. "|" . cr
+.s
+-10e25 f. "|" . cr
+1.2e-3 f. "|" . cr
+F1.2e-1000 f. "|" . cr
+100e7 f. "|" . cr
+F1e200 f. "|" . cr 
+.s
+1. dup f. cr
+dup f. cr
 
 
+\ F2.31e1001 dup mantissa swap dup exponent .s
+\ -11 dup mantissa swap dup exponent .s
+\ F1.2e2 dup mantissa swap dup exponent .s
+
+
+\ 15.1e25 mantissa .s
