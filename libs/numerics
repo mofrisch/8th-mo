@@ -1,4 +1,4 @@
-\ vim: ft=8th:
+-*- 8th -*-
 \ common numeric words
 
 var max-iterations   1000 max-iterations !
@@ -6,34 +6,36 @@ var num-debug   false num-debug !
 
 var exp-size
 2 exp-size !
-var mantissa-size
 
+var mantissa-size
 : mantissa! \ n --
    dup mantissa-size ! 3 - ## ;
-
 10 mantissa!
 
 var epsilon
-
 : eps \ -- n
    epsilon @ ;
-
 : eps! \ n --
    epsilon ! ;
+1e-16 eps!
 
-1e-15 eps!
+var print-lines    1 print-lines !  \ in a table, print every n-th number
 
 : short-floats \ --
-   19 mantissa! 1e-15 eps! ;
+   19 mantissa! 1e-16 eps! ;
 
 : big-floats \ n --
    dup n:1+ dup n# mantissa! F10 swap n:neg n:^ eps! ;
 
+short-floats
+
 defer: f
 
+\ right now ln does not work for bfloat, so we convert
 : ld \ n -- n
    n:float n:ln 10 n:ln n:/ ;
 
+\ for n > some 300, this is not correct because of ln error
 : exponent \ n -- n
    dup 0 > if ld  else
    dup 0 < if n:neg ld else
@@ -41,9 +43,8 @@ defer: f
 
 : exp-length \ n -- n
    dup 0 = if drop 1 else 
-      dup 0 < if n:neg then 
-      n:1+ ld n:ceil n:int 
-   then ;
+   dup 0 < if n:neg then 
+   n:1+ ld n:ceil n:int then ;
 
 : print-sign \ n -- n
    dup 0 < if "-" . else "+" . then ;
@@ -62,8 +63,10 @@ defer: f
 
 : f. \ n --
    mantissa-size @ #>
-   dup exponent dup  >r \ n  exp
+   dup exponent dup  >r \ n exp
    mantissa . "e" . 
    r> print-exponent ;
+
+
    
 

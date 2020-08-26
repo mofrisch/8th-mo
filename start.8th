@@ -4,3 +4,9 @@ with: con
 normal
 cls
 
+-- w: word
+-- s: before -- after
+-- d: description
+: word 
+   definition ;
+

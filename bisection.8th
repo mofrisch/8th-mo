@@ -10,53 +10,60 @@ var f(a)
 : midpoint \ a b -- a+(b-a)/2
    over n:- 2 n:/ n:+ ; 
 
-: print-row \ n a b p f(p) -- n a b p f(p)
-   4 #> 4 pick . " " . 
-   3 pick f. " " .
-   2 pick f. " " .
-   1 pick f. " " .
-   0 pick f. " " .
-   3 pick 2 pick n:- n:abs f. 
-   cr ;
+: print-row \ n a b p f(p) lines -- n a b p f(p)
+   num-debug @ if
+      5 pick swap n:mod 0 = if
+         4 #> 4 pick . " " . 
+         3 pick f. " " .
+         2 pick f. " " .
+         1 pick f. " " .
+         0 pick f. " " .
+         3 pick 2 pick n:- n:abs f. 
+         cr 
+      then 
+   else drop then ;
 
 : criterion \ n b p f(p) -- n b p f(p) ?
    dup 0 eps f~ >r 
    -rot 2dup eps f~ >r rot 
    2r> or ;
 
-: crit \ n a b -- n a b ?
-   f(a) @ 0 eps f~ >r \ n a b
-   2dup eps f~ r> \ n ? a b ?
-   or ;
-
 : next-interval \ a b n --  a p | p b
-   dup 11 = if ;; then
+   dup max-iterations @ n:= if ;; then
    -rot 2dup midpoint dup f \ n a b p f(p)
-   num-debug @ if print-row then
-   f(a) @ over n:* 0 n:> if \ n a b p f(p) f(a)*f(p)>0
-      f(a) ! rot drop swap \ n a b p 
-   else 
-      drop nip \ n a b 
-   then 
-   crit if rot break else
-   rot drop then ; 
+   criterion if 
+      1 print-row 
+      break 
+   else
+      print-lines @ print-row
+      f(a) @ over n:* 0 n:> if \ n a b p f(p) f(a)*f(p)>0
+         f(a) ! rot drop swap \ n a b p 
+      else 
+         drop nip \ n a b 
+   then then rot drop ; 
 
-: bisection \ a b -- p
+: bisection \ a b -- a b
    over f f(a) ! 
    num-debug @ if
    "n     a                       b                       p                       f(p)                    |a-b| " . cr
    124 draw-line cr
    then
-   ' next-interval 1 11 loop 11 n:= if
-   "ran " . 10 . " iterations, but result was not close enough" . cr then ;
+   ' next-interval 0 max-iterations @ loop .s
+   num-debug @ if 124 draw-line cr then
+   max-iterations @ n:= if
+      "ran " . max-iterations @ . " iterations, but result was not close enough" . cr then 
+    ;
 
 true num-debug !
-short-floats
 
-\ 40 big-floats
-1e-15 eps!
-' f-test w:is f
-1. 2. bisection f. cr
+
+(* 1 print-lines !
+40 big-floats
+\ 1e-16 eps!
+' f-test w:is f *)
+F1. 2. bisection 2dup f. f. n:- n:abs f. cr
+
+
 
 
 
