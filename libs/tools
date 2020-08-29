@@ -30,6 +30,7 @@
 \ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 \ common tools
+ns: G
 
 : draw-line \ n --
    ( "-" . ) swap times ;
@@ -40,6 +41,8 @@
 : 2>r \ r1 r2 --
    >r >r ;
 
+ns: n
+
 : >= \ n1 n2 -- ?
    n:< not ;
 
@@ -49,6 +52,8 @@
 : <> \ n1 n2 -- ?
    n:= not ;
 
-: f~ \ f1 f2 eps > 0 -- ?
+: ~ \ f1 f2 eps > 0 -- ?
    -rot n:- n:abs swap n:< ;
+
+
 

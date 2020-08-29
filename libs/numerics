@@ -30,7 +30,7 @@
 \ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 \ common numeric words
-ns: num 
+ns: nm
 1000 var, max-iterations
 false var, num-debug
 2 var, exp-size

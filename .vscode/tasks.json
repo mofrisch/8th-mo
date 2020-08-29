@@ -33,7 +33,7 @@
          "type": "promptString",
          "id": "filename",
          "description": "Enter a filename: ",
-         "default": "abc.8th"
+         "default": "bisection.8th"
       }
    ]
 }
