@@ -1,14 +1,11 @@
 : print
    dup . cr 
-   dup 6 = if dup break then
-   drop
-   ;
+   dup 6 = if dup break then drop ;
 
 : my-loop
-   ' print 1 10 loop "exit at: " . . cr
-   ;
+   ' print 1 10 loop "exit at: " . . cr ;
 
 my-loop
 
--*- 8th -*-
+
 

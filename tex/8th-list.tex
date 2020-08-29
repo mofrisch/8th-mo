@@ -1,0 +1,22 @@
+\documentclass{article} 
+\usepackage{minted}
+\usemintedstyle{}
+\begin{document} 
+This is a comment
+\begin{minted}{forth}
+
+\ comment 
+: print \ n --
+   dup . cr 
+   dup 6 = if dup break then drop ;
+\end{minted} 
+   \begin{minted}{forth}
+: my-loop
+   ' print 1 10 loop "exit at: " . . cr ;
+\end{minted} 
+   \begin{minted}{forth}
+my-loop
+
+\end{minted} 
+\end{document}
+

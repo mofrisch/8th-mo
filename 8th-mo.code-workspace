@@ -1,10 +1,10 @@
 {
 	"folders": [
 		{
-			"path": "../8th"
+			"path": "."
 		},
 		{
-			"path": "."
+			"path": "../8th"
 		}
 	],
 	"settings": {

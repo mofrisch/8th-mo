@@ -30,16 +30,18 @@
 \ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 \ common numeric words
-
-var max-iterations   1000 max-iterations !
-var num-debug   false num-debug !
-
-var exp-size
-2 exp-size !
+ns: num 
+1000 var, max-iterations
+false var, num-debug
+2 var, exp-size
 
 var mantissa-size
-: mantissa! \ n --
-   dup mantissa-size ! 3 - ## ;
+-- w: num:mantissa!
+-- s: n -- 
+-- d: change width of mantissa to n          
+: mantissa! 
+    dup mantissa-size ! 3 - ## ;
+
 10 mantissa!
 
 var epsilon
@@ -49,7 +51,7 @@ var epsilon
    epsilon ! ;
 1e-16 eps!
 
-var print-lines    1 print-lines !  \ in a table, print every n-th number
+1 var, print-lines \ in a table, print every n-th number
 
 : short-floats \ --
    19 mantissa! 1e-16 eps! ;

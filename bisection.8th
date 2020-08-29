@@ -1,36 +1,11 @@
 \ -*- 8th -*-
-\ BSD 3-Clause License
-
 \ Copyright (c) 2020, Moritz Frisch
 \ All rights reserved.
+\ BSD 3-Clause License see LICENSE for details
 
-\ Redistribution and use in source and binary forms, with or without
-\ modification, are permitted provided that the following conditions are met:
-
-\ 1. Redistributions of source code must retain the above copyright notice, this
-\   list of conditions and the following disclaimer.
-
-\ 2. Redistributions in binary form must reproduce the above copyright notice,
-\   this list of conditions and the following disclaimer in the documentation
-\   and/or other materials provided with the distribution.
-
-\ 3. Neither the name of the copyright holder nor the names of its
-\  contributors may be used to endorse or promote products derived from
-\   this software without specific prior written permission.
-
-\ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-\ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-\ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-\ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-\ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-\ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-\ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-\ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-\ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-\ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-needs numerics
 needs tools
+needs numerics
+with: num
 
 var f(a)
 
@@ -76,23 +51,25 @@ var f(a)
 : bisection \ a b -- a b
    over f f(a) ! 
    num-debug @ if
-   "n     a                       b                       p                       f(p)                    |a-b| " . cr
-   124 draw-line cr
+      "n     a                       b                       p                       f(p)                    |a-b| " . cr
+      124 draw-line cr
    then
-   ' next-interval 0 max-iterations @ loop .s
+   ' next-interval 0 max-iterations @ loop
    num-debug @ if 124 draw-line cr then
    max-iterations @ n:= if
-      "ran " . max-iterations @ . " iterations, but result was not close enough" . cr then 
-    ;
+      "ran " . max-iterations @ . " iterations, but result was not close enough" . cr 
+   then ;
 
 true num-debug !
 
 
-(* 1 print-lines !
-40 big-floats
-\ 1e-16 eps!
-' f-test w:is f *)
+\ 1 print-lines !
+\ 40 big-floats
+\ 1e-16 eps! *)
+' f-test w:is f
 F1. 2. bisection 2dup f. f. n:- n:abs f. cr
+
+;with
 
 
 
