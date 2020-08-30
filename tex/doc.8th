@@ -1,0 +1,79 @@
+[] var, out
+false var, writing-comment
+false var, writing-code
+
+: write-line
+   "\n" s:+ rot swap f:write drop swap ;
+
+: out-file \ out in
+   f:open ' write-line f:eachline f:close drop ;
+
+: write-header \ out --
+   "tex-includes/tex-header.tex" out-file ;
+
+: write-footer
+   "tex-includes/tex-footer.tex" out-file ;
+
+: write-file \ s -- s
+   ".tex" s:+ dup 
+   f:create dup >r write-header
+   out @ ( "\n" s:+ r@ swap f:write 2drop ) a:each! drop
+   r> dup write-footer
+   f:close ;
+
+: out-line
+   out @ swap a:push ;
+
+: finish-code
+   writing-code @ if false writing-code !
+   "\\end{minted}" out-line drop then ;
+
+: start-code
+   writing-code @ not if
+   true writing-code !
+   "\\begin{minted}{forth}" out-line drop then ;
+
+: finish-comment
+   writing-comment @ if false writing-comment !
+   then ;
+
+: start-comment
+   writing-comment @ not if
+   true writing-comment ! then ;
+   
+
+: process 
+   "\\ : " s:search null? not nip if
+      -4 s:rsub null? not if 
+         finish-code start-comment out-line 
+      then
+   else 
+      dup "" = if 
+         writing-comment @ if 
+            drop " " out-line 
+         then  
+         finish-comment finish-code 
+      else 
+         0 s:@ '\ = not if 
+            finish-comment start-code out-line 
+         then
+      then 
+   then drop ;
+
+-- w: process-file
+-- s: s -- s
+-- d: Process the file.
+: process-file 
+   f:open 
+   ' process f:eachline 
+   f:close ;
+\ : Takes a *.8th filename as parameter and writes the formatted result
+\ : to *.8th.tex.
+: app:main
+   argc 1 = if 
+      0 args dup process-file write-file
+      "Written: " . . cr
+   else
+      "I need exactly one argument: The filename to process." .
+   then
+   bye ; 
