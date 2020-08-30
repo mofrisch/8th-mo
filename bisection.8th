@@ -21,6 +21,7 @@
 
 needs tools
 needs numerics
+with: nm
 
 \ : We store $f(a)$ to not have to evaluate it twice.
 var f(a) 
@@ -98,6 +99,7 @@ true nm:num-debug !
 
 ' f-test w:is nm:f
 1. 2. bisection .s 2dup nm:f. nm:f. n:- n:abs nm:f. cr
+;with
 
 bye
 

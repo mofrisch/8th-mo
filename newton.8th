@@ -1,0 +1,48 @@
+\ -*- 8th -*-
+\ : File: \texttt{newton.8th} \\
+\ : Copyright (c) 2020, Moritz Frisch\\
+\ : All rights reserved.\\
+\ : This file may be used according to the BSD 3-Clause License\\
+\ : see LICENSE for details\\
+
+\ : Find a root using Newton's method\\
+
+needs tools
+needs numerics
+with: nm
+
+\ : Test function: $e^x-2$, has a root at $\ln 2\sim 0.69$.
+: f-test \ n -- n
+   dup n:cos swap n:- ;
+
+\ : Derivative: $e^x$.
+: f'-test \ n -- n
+   n:sin n:neg 1 - ;
+
+: criterion \ x_0 x_1 -- x_1
+   tuck eps n:~ ;
+
+: max-iters?
+   max-iterations @ n:= if "too many iterations" . cr ;; then ;
+
+: finished?
+   criterion if break then ;
+
+: algorithm
+   dup dup dup f swap f' n:/ n:- ;
+
+: do-it \ n 
+   dup . cr max-iters? algorithm finished? ;
+
+\ : next-value \ n -- n
+\    quit? dup dup dup f swap f' n:/ n:- 
+\    criterion if break then ;
+
+: newton \ n -- n
+   ' do-it 0 max-iterations @ loop ;
+
+3 max-iterations !
+' f-test w:is f
+' f'-test w:is f'
+1. newton . cr
+

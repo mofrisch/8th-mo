@@ -1,0 +1,139 @@
+\documentclass{article} 
+\usepackage{minted}
+\usepackage{amsmath}
+\usemintedstyle{pastie}
+\parindent0cm
+\begin{document} 
+File: \texttt{numerics} \\
+Copyright (c) 2020, Moritz Frisch\\
+All rights reserved.\\
+This file may be used according to the BSD 3-Clause License\\
+see LICENSE for details\\
+ 
+This is the numerics library, common to all numeric subroutines.
+ 
+\begin{minted}{forth}
+ns: nm
+\end{minted}
+Number of iterations maximally performed in an algorithm to avoid
+endless loops, if the procedure converges too slowly.
+\begin{minted}{forth}
+1000 var, max-iterations
+\end{minted}
+By default, we do not show all the steps performed.
+\begin{minted}{forth}
+false var, num-debug
+\end{minted}
+Width of the exponent display. Your numbers will only look nice,
+if your largest exponent is smaller than this.
+\begin{minted}{forth}
+2 var, exp-size
+\end{minted}
+Width $w$ of the mantissa. We have three places in front, the sign,
+a number and the decimal point, so we have $w-3$ decimal places.
+\begin{minted}{forth}
+var mantissa-size \ n --
+\end{minted}
+Set mantissa size.        
+\begin{minted}{forth}
+: mantissa! \ n --
+    dup mantissa-size ! 3 - ## ;
+\end{minted}
+The default is $\pm1.0000000$.
+\begin{minted}{forth}
+10 mantissa!
+\end{minted}
+This is the error bound we normally use, the default is $\epsilon=10^{-16}$.
+\begin{minted}{forth}
+var epsilon
+: eps \ -- n
+   epsilon @ ;
+: eps! \ n --
+   epsilon ! ;
+1e-16 eps!
+\end{minted}
+In a table, we usually print every line. If you want only every $n$-th line,
+set this to $n$. The first and last line will always be shown.
+\begin{minted}{forth}
+1 var, print-lines 
+\end{minted}
+We use machine numbers by default. If you want big floats, which are 
+considerabely slower, you may set e.g. $30$ bigfloats. If you need the
+precision, but don't want to display all the places, set \texttt{n\#}
+to a convenient value. To avoid problems with rounding or accuracy,
+you should use \texttt{big-floats} once and not change it thereafter.
+\begin{minted}{forth}
+: short-floats \ --
+   19 mantissa! 1e-16 eps! ;
+\end{minted}
+\begin{minted}{forth}
+: big-floats \ n --
+   dup n:1+ dup n# mantissa! F10 swap n:neg n:^ eps! ;
+\end{minted}
+\begin{minted}{forth}
+short-floats
+\end{minted}
+Forward declaration of symbols, we often use and like to change.
+\begin{minted}{forth}
+defer: f
+\end{minted}
+Return the decimal $\log$ of $n$. Right now $\ln$ does not work for bfloat, 
+so we convert to a float. Of course, we don't have the precision we would
+expect. Will be fixed in $20.06$, hopefully.
+\begin{minted}{forth}
+: ld \ n -- n
+   n:float n:ln 10 n:ln n:/ ;
+\end{minted}
+Return the exponent of $n$. For $n > 300$ or so, this is not 
+correct because of the $\ln$ error. We could divide successively by $10$ as a
+workaround, if the fix is not made soon.
+\begin{minted}{forth}
+: exponent \ n -- n
+   dup 0 > if ld  else
+   dup 0 < if n:neg ld else
+   then then n:floor n:int ;
+\end{minted}
+Return the length of the exponent.
+\begin{minted}{forth}
+: exp-length \ n -- n
+   dup 0 = if drop 1 else 
+   dup 0 < if n:neg then 
+   n:1+ ld n:ceil n:int then ;
+\end{minted}
+Print the sign of the exponent.
+\begin{minted}{forth}
+: print-sign \ n -- n
+   dup 0 < if "-" . else "+" . then ;
+\end{minted}
+Print zeroes to fill the exponent.
+\begin{minted}{forth}
+: print-zeroes \ n -- n
+   dup exp-length exp-size @ swap n:- ( "0" . ) swap times ;
+\end{minted}
+Print the value of the exponent.   
+\begin{minted}{forth}
+: print-value \ n --
+   n:abs . ;
+\end{minted}
+Print the exponent as $\pm01$.
+\begin{minted}{forth}
+: print-exponent \ n -- +|-00n
+   print-sign print-zeroes print-value ;
+\end{minted}
+Return the mantissa.
+\begin{minted}{forth}
+: mantissa \ n exp -- n
+   10. swap n:^ n:/ ; 
+\end{minted}
+Print a number in the format $[-]1.0000000e\pm01$.
+\begin{minted}{forth}
+: f. \ n --
+   mantissa-size @ #>
+   dup exponent dup  >r \ n exp
+   mantissa . "e" . 
+   r> print-exponent ;
+\end{minted}
+\begin{minted}{forth}
+   
+\end{minted}
+\end{document}

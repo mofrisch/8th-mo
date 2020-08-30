@@ -15,7 +15,7 @@ false var, writing-code
    "tex-includes/tex-footer.tex" out-file ;
 
 : write-file \ s -- s
-   "tex/" swap s:+ ".tex" s:+ dup 
+   "tex/" swap s:+ ".tex" s:+ dup dup . cr
    f:create dup >r write-header
    out @ ( "\n" s:+ r@ swap f:write 2drop ) a:each! drop
    r> dup write-footer

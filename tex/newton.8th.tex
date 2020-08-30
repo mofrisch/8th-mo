@@ -1,0 +1,42 @@
+\documentclass{article} 
+\usepackage{minted}
+\usepackage{amsmath}
+\usemintedstyle{pastie}
+\parindent0cm
+\begin{document} 
+File: \texttt{newton.8th} \\
+Copyright (c) 2020, Moritz Frisch\\
+All rights reserved.\\
+This file may be used according to the BSD 3-Clause License\\
+see LICENSE for details\\
+ 
+Find a root using Newton's method\\
+ 
+\begin{minted}{forth}
+needs numerics
+with: nm
+\end{minted}
+Test function: $e^x-2$, has a root at $\ln 2\sim 0.69$.
+\begin{minted}{forth}
+: f-test \ n -- n
+   n:exp 2 n:- ;
+\end{minted}
+Derivative: $e^x$.
+\begin{minted}{forth}
+: f'-test \ n -- n
+   n:exp ;
+\end{minted}
+\begin{minted}{forth}
+: next-value \ n -- n
+   drop dup dup f' swap f .s n:/ swap n:- .s ;
+\end{minted}
+\begin{minted}{forth}
+: newton \ n -- n
+   ' next-value 0 3 loop ;
+\end{minted}
+\begin{minted}{forth}
+' f-test w:is f
+' f'-test w:is f'
+0. newton .
+\end{minted}
+\end{document}

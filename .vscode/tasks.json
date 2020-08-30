@@ -6,7 +6,8 @@
       {
          "label": "run 8th",
          "type": "shell",
-         "command": "8th -f ${relativeFile} ${input:filename}",
+         // "command": "8th -f ${relativeFile} ${input:filename}",
+         "command": "8th -f doc.8th newton.8th",
          "problemMatcher": [
             {
                "owner": "8th",
@@ -33,7 +34,7 @@
          "type": "promptString",
          "id": "filename",
          "description": "Enter a filename: ",
-         "default": "bisection.8th"
+         "default": "libs/numerics"
       }
    ]
 }

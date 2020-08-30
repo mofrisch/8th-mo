@@ -1,49 +1,32 @@
 \ -*- 8th -*-
-\ BSD 3-Clause License
+\ : File: \texttt{numerics} \\
+\ : Copyright (c) 2020, Moritz Frisch\\
+\ : All rights reserved.\\
+\ : This file may be used according to the BSD 3-Clause License\\
+\ : see LICENSE for details\\
 
-\ Copyright (c) 2020, Moritz Frisch
-\ All rights reserved.
+\ : This is the numerics library, common to all numeric subroutines.
 
-\ Redistribution and use in source and binary forms, with or without
-\ modification, are permitted provided that the following conditions are met:
-
-\ 1. Redistributions of source code must retain the above copyright notice, this
-\   list of conditions and the following disclaimer.
-
-\ 2. Redistributions in binary form must reproduce the above copyright notice,
-\   this list of conditions and the following disclaimer in the documentation
-\   and/or other materials provided with the distribution.
-
-\ 3. Neither the name of the copyright holder nor the names of its
-\  contributors may be used to endorse or promote products derived from
-\   this software without specific prior written permission.
-
-\ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-\ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-\ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-\ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-\ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-\ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-\ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-\ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-\ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-\ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-\ common numeric words
 ns: nm
+\ : Number of iterations maximally performed in an algorithm to avoid
+\ : endless loops, if the procedure converges too slowly.
 1000 var, max-iterations
+\ : By default, we do not show all the steps performed.
 false var, num-debug
+\ : Width of the exponent display. Your numbers will only look nice,
+\ : if your largest exponent is smaller than this.
 2 var, exp-size
 
-var mantissa-size
--- w: num:mantissa!
--- s: n -- 
--- d: change width of mantissa to n          
-: mantissa! 
+\ : Width $w$ of the mantissa. We have three places in front, the sign,
+\ : a number and the decimal point, so we have $w-3$ decimal places.
+var mantissa-size \ n --
+\ : Set mantissa size.        
+: mantissa! \ n --
     dup mantissa-size ! 3 - ## ;
-
+\ : The default is $\pm1.0000000$.
 10 mantissa!
 
+\ : This is the error bound we normally use, the default is $\epsilon=10^{-16}$.
 var epsilon
 : eps \ -- n
    epsilon @ ;
@@ -51,8 +34,15 @@ var epsilon
    epsilon ! ;
 1e-16 eps!
 
-1 var, print-lines \ in a table, print every n-th number
+\ : In a table, we usually print every line. If you want only every $n$-th line,
+\ : set this to $n$. The first and last line will always be shown.
+1 var, print-lines 
 
+\ : We use machine numbers by default. If you want big floats, which are 
+\ : considerabely slower, you may set e.g. $30$ bigfloats. If you need the
+\ : precision, but don't want to display all the places, set \texttt{n\#}
+\ : to a convenient value. To avoid problems with rounding or accuracy,
+\ : you should use \texttt{big-floats} once and not change it thereafter.
 : short-floats \ --
    19 mantissa! 1e-16 eps! ;
 
@@ -61,38 +51,52 @@ var epsilon
 
 short-floats
 
+\ : Forward declaration of symbols, we often use and like to change.
 defer: f
+defer: f'
 
-\ right now ln does not work for bfloat, so we convert
+
+\ : Return the decimal $\log$ of $n$. Right now $\ln$ does not work for bfloat, 
+\ : so we convert to a float. Of course, we don't have the precision we would
+\ : expect. Will be fixed in $20.06$, hopefully. I found ln1p to work, however.
 : ld \ n -- n
    n:float n:ln 10 n:ln n:/ ;
 
-\ for n > some 300, this is not correct because of ln error
+\ : Return the exponent of $n$. For $n > 300$ or so, this is not 
+\ : correct because of the $\ln$ error. We could divide successively by $10$ as a
+\ : workaround, if the fix is not made soon.
 : exponent \ n -- n
    dup 0 > if ld  else
    dup 0 < if n:neg ld else
-   then then n:floor n:int ;
+   then then n:round n:int ;
 
+\ : Return the length of the exponent.
 : exp-length \ n -- n
    dup 0 = if drop 1 else 
    dup 0 < if n:neg then 
    n:1+ ld n:ceil n:int then ;
 
+\ : Print the sign of the exponent.
 : print-sign \ n -- n
    dup 0 < if "-" . else "+" . then ;
 
+\ : Print zeroes to fill the exponent.
 : print-zeroes \ n -- n
    dup exp-length exp-size @ swap n:- ( "0" . ) swap times ;
-   
+
+\ : Print the value of the exponent.   
 : print-value \ n --
    n:abs . ;
 
+\ : Print the exponent as $\pm01$.
 : print-exponent \ n -- +|-00n
    print-sign print-zeroes print-value ;
 
+\ : Return the mantissa.
 : mantissa \ n exp -- n
    10. swap n:^ n:/ ; 
 
+\ : Print a number in the format $[-]1.0000000e\pm01$.
 : f. \ n --
    mantissa-size @ #>
    dup exponent dup  >r \ n exp
