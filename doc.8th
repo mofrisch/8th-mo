@@ -1,68 +1,49 @@
-\documentclass{article} 
-\usepackage{minted}
-\usepackage{amsmath}
-\usemintedstyle{}
-\begin{document} 
-\begin{minted}{forth}
 [] var, out
 false var, writing-comment
 false var, writing-code
-\end{minted}
-\begin{minted}{forth}
+
 : write-line
    "\n" s:+ rot swap f:write drop swap ;
-\end{minted}
-\begin{minted}{forth}
+
 : out-file \ out in
    f:open ' write-line f:eachline f:close drop ;
-\end{minted}
-\begin{minted}{forth}
+
 : write-header \ out --
-   "tex/tex-header.tex" out-file ;
-\end{minted}
-\begin{minted}{forth}
+   "tex-includes/tex-header.tex" out-file ;
+
 : write-footer
-   "tex/tex-footer.tex" out-file ;
-\end{minted}
-\begin{minted}{forth}
+   "tex-includes/tex-footer.tex" out-file ;
+
 : write-file \ s -- s
-   ".tex" s:+ dup 
+   "tex/" swap s:+ ".tex" s:+ dup 
    f:create dup >r write-header
    out @ ( "\n" s:+ r@ swap f:write 2drop ) a:each! drop
    r> dup write-footer
    f:close ;
-\end{minted}
-\begin{minted}{forth}
+
 : out-line
    out @ swap a:push ;
-\end{minted}
-\begin{minted}{forth}
+
 : finish-code
    writing-code @ if false writing-code !
    "\\end{minted}" out-line drop then ;
-\end{minted}
-\begin{minted}{forth}
+
 : start-code
    writing-code @ not if
    true writing-code !
    "\\begin{minted}{forth}" out-line drop then ;
-\end{minted}
-\begin{minted}{forth}
+
 : finish-comment
    writing-comment @ if false writing-comment !
    then ;
-\end{minted}
-\begin{minted}{forth}
+
 : start-comment
    writing-comment @ not if
    true writing-comment ! then ;
    
-\end{minted}
-\begin{minted}{forth}
+
 : process 
-\end{minted}
-\\ : " s:search null? not nip if
-\begin{minted}{forth}
+   "\\ : " s:search null? not nip if
       -4 s:rsub null? not if 
          finish-code start-comment out-line 
       then
@@ -78,8 +59,7 @@ false var, writing-code
          then
       then 
    then drop ;
-\end{minted}
-\begin{minted}{forth}
+
 -- w: process-file
 -- s: s -- s
 -- d: Process the file.
@@ -87,10 +67,8 @@ false var, writing-code
    f:open 
    ' process f:eachline 
    f:close ;
-\end{minted}
-Takes a *.8th filename as parameter and writes the formatted result
-to *.8th.tex.
-\begin{minted}{forth}
+\ : Takes a *.8th filename as parameter and writes the formatted result
+\ : to *.8th.tex.
 : app:main
    argc 1 = if 
       0 args dup process-file write-file
@@ -99,4 +77,3 @@ to *.8th.tex.
       "I need exactly one argument: The filename to process." .
    then
    bye ; 
-\end{document}
