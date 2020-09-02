@@ -1,6 +1,7 @@
+needs tools
 needs numerics
 with: nm
-3 exp-size !
+4 exp-size !
 0 f. "|" . cr   .s
 0.0 f. "|" . cr
 1 f. "|" . cr
@@ -17,12 +18,13 @@ with: nm
 1.2e-3 f. "|" . cr
 F1.2e-1000 f. "|" . cr
 100e7 f. "|" . cr
+1000e3 f. "|" . cr
 F1e200 f. "|" . cr 
 .s
 1. dup f. cr
 dup f. cr
 F1e1000 f. cr
-F1e-1000 f. cr
+F1e-100000 f. cr
 
 \ F2.31e1001 dup mantissa swap dup exponent .s
 \ -11 dup mantissa swap dup exponent .s

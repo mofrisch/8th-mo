@@ -19,30 +19,32 @@ with: nm
 : f'-test \ n -- n
    n:sin n:neg 1 - ;
 
-: criterion \ x_0 x_1 -- x_1
-   tuck eps n:~ ;
+: nwt-criterion? \ n x1 -- n x1
+   row @ 3 a:@ nearly-zero swap 
+   2 a:@ nearly-zero nip or ;
 
-: max-iters?
-   max-iterations @ n:= if "too many iterations" . cr ;; then ;
-
-: finished?
-   criterion if break then ;
-
-: algorithm
-   dup dup dup f swap f' n:/ n:- ;
-
-: do-it \ n 
-   dup . cr max-iters? algorithm finished? ;
-
-\ : next-value \ n -- n
-\    quit? dup dup dup f swap f' n:/ n:- 
-\    criterion if break then ;
+: nwt-algorithm \ n x0 -- n x1
+   >r 0 add-item 
+   dup dup dup f 2 add-item  
+   swap f' n:/ n:- 1 add-item
+   2dup n:- n:abs 3 add-item drop nip r> ;
 
 : newton \ n -- n
-   ' do-it 0 max-iterations @ loop ;
+   ["x0","x1","f(x0)","|x1-x0|"] print-header
+   ' do-it 0 max-iterations @ loop
+   print-footer 
+   print-messages cr ;
 
-3 max-iterations !
+true num-debug !
+\ 3 max-iterations !
 ' f-test w:is f
 ' f'-test w:is f'
-1. newton . cr
+' nwt-algorithm w:is algorithm
+' nwt-criterion? w:is criterion?
+4 exp-size !
+50 big-floats
+num-size . cr
+F1. newton 50 mantissa! f. cr
+
+;with bye
 
