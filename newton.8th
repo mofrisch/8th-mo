@@ -10,41 +10,41 @@
 needs tools
 needs numerics
 with: nm
+with: n
 
 \ : Test function: $e^x-2$, has a root at $\ln 2\sim 0.69$.
 : f-test \ n -- n
-   dup n:cos swap n:- ;
+   dup cos swap - ;
 
 \ : Derivative: $e^x$.
 : f'-test \ n -- n
-   n:sin n:neg 1 - ;
+   sin neg 1 - ;
 
-: nwt-criterion? \ n x1 -- n x1
-   row @ 3 a:@ nearly-zero swap 
-   2 a:@ nearly-zero nip or ;
+: nwt-criterion? \ x1 n -- x1 n
+   row @ 3 a:@ 0~ swap 
+   2 a:@ 0~ nip or ;
 
-: nwt-algorithm \ n x0 -- n x1
+: nwt-algorithm \ x0 n -- x1 n
    >r 0 add-item 
    dup dup dup f 2 add-item  
-   swap f' n:/ n:- 1 add-item
-   2dup n:- n:abs 3 add-item drop nip r> ;
+   swap f' / - 1 add-item
+   2dup - abs 3 add-item drop nip r> ;
 
 : newton \ n -- n
-   ["x0","x1","f(x0)","|x1-x0|"] print-header
-   ' do-it 0 max-iterations @ loop
-   print-footer 
-   print-messages cr ;
+   ["x0","x1","f(x0)","|x1-x0|"] main ;
 
-true num-debug !
+num-debug on
 \ 3 max-iterations !
 ' f-test w:is f
 ' f'-test w:is f'
 ' nwt-algorithm w:is algorithm
 ' nwt-criterion? w:is criterion?
-4 exp-size !
-50 big-floats
-num-size . cr
-F1. newton 50 mantissa! f. cr
 
-;with bye
+\ 10 print-lines !
+200 big-floats
+10 man!
+2 print-lines !
+F1. newton .s f. cr
+
+;with ;with bye
 

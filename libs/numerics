@@ -8,6 +8,7 @@
 \ : This is the numerics library, common to all numeric subroutines.
 
 needs tools
+with: n
 
 ns: nm
 \ : Number of iterations maximally performed in an algorithm to avoid
@@ -18,15 +19,17 @@ false var, num-debug
 \ : Width of the exponent display. Your numbers will only look nice,
 \ : if your largest exponent is smaller than this.
 2 var, exp-size
+: exp!
+   exp-size ! ;
 
 \ : Width $w$ of the mantissa. We have three places in front, the sign,
 \ : a number and the decimal point, so we have $w-3$ decimal places.
-var mantissa-size \ n --
+10 var, mantissa-size \ n --
 \ : Set mantissa size.        
-: mantissa! \ n --
+: man! \ n --
     dup mantissa-size ! 3 - ## ;
 \ : The default is $\pm1.0000000$.
-10 mantissa!
+10 man!
 
 \ : This is the error bound we normally use, the default is $\epsilon=10^{-16}$.
 var epsilon
@@ -46,10 +49,7 @@ var epsilon
 \ : to a convenient value. To avoid problems with rounding or accuracy,
 \ : you should use \texttt{big-floats} once and not change it thereafter.
 : short-floats \ --
-   19 mantissa! 1e-16 eps! ;
-
-: big-floats \ n --
-   dup n:1+ dup n# mantissa! F10 swap n:neg n:^ eps! ;
+   19 man! 2 exp! 1e-16 eps! ;
 
 short-floats
 
@@ -58,24 +58,24 @@ defer: f
 defer: f'
 
 : ld>=1 \ n -- n
-   n:1- n:bfloat n:ln1p F9 n:ln1p n:/ ;
+   1- bfloat ln1p F9 ln1p / ;
 \ : Return the decimal $\log$ of $n$. Right now $\ln$ does not work for bfloat, 
 \ : so we convert to a float. Of course, we don't have the precision we would
 \ : expect. Will be fixed in $20.06$, hopefully. I found ln1p to work, however.
 : ld \ n -- n
-   dup 1 < if 1 swap n:/ ld>=1 n:neg else ld>=1 then ;
+   dup 1 < if 1 swap / ld>=1 neg else ld>=1 then ;
 
 \ : Return the exponent of $n$. For $n > 300$ or so, this is not 
 \ : correct because of the $\ln$ error. We could divide successively by $10$ as a
 \ : workaround, if the fix is not made soon.
 : exponent \ n -- n
    dup 0 > if ld  else
-   dup 0 < if n:neg ld else
-   then then n:round n:int ;
+   dup 0 < if neg ld else
+   then then round int ;
 
 \ : Return the length of the exponent.
 : exp-length \ n -- n
-   dup 0 n:<> if n:abs ld n:int n:1+ else drop 1 then ; 
+   dup 0 <> if abs ld int 1+ else drop 1 then ; 
    
 
 \ : Print the sign of the exponent.
@@ -84,11 +84,11 @@ defer: f'
 
 \ : Print zeroes to fill the exponent.
 : print-zeroes \ n -- n
-   dup exp-length exp-size @ swap n:- ( "0" . ) swap times ;
+   dup exp-length exp-size @ swap - ( "0" . ) swap times ;
 
 \ : Print the value of the exponent.   
 : print-value \ n --
-   n:abs . ;
+   abs . ;
 
 \ : Print the exponent as $\pm01$.
 : print-exponent \ n -- +|-00n
@@ -96,7 +96,7 @@ defer: f'
 
 \ : Return the mantissa.
 : mantissa \ n exp -- n
-   10. swap n:^ n:/ ; 
+   10. swap ^ / ; 
 
 \ : Print a number in the format $[-]1.0000000e\pm01$.
 : f. \ n --
@@ -105,55 +105,78 @@ defer: f'
    mantissa . "e" . 
    r> print-exponent ;
 
+: big-floats \ n --
+   dup exp-length exp! 
+   dup 1+ dup n# man! 
+   F10 swap neg ^ eps! ;
+
 : num-size
-   mantissa-size @ exp-size @ 2 n:+ n:+ ;
+   mantissa-size @ exp-size @ 2 + + ;
 
 [] var, messages
 [] var, row
 0 var, row-length
 
 : print-header \ a --
-   "n    " .
-   dup ( dup . s:len num-size swap n:- n:1+ ( space ) swap times drop ) a:each! cr
-   a:len num-size n:1+ * 3 n:+ 
-   dup row-length !
-   draw-line cr 2drop ;
+   num-debug @ if
+      "n    " .
+      dup ( dup . s:len num-size swap - 1+ ( space ) swap times drop ) a:each! cr
+      a:len num-size 1+ * 3 + 
+      dup row-length !
+      draw-line cr 2drop 
+   else drop then ;
 
 : print-row \ n x1 -- n x1
    num-debug @ if
-      dup dup print-lines @ n:mod 0 = if
-         4 #> .
-         row @ ( f. space ) a:each! drop
-         cr 
-      then 
+      dup
+      4 #> .
+      row @ ( f. space ) a:each! drop
+      cr 
    then ;
    
 
 : print-footer
-   row-length @ draw-line cr ;
+   num-debug @ if
+      row-length @ draw-line cr 
+   then ;
 
 : print-messages
    messages @ ( . ) a:each! drop ;
 
-: nearly-zero \ n -- T
-   0 eps n:~ ;
+: 0~ \ n -- T
+   0 eps ~ ;
 
 : max-iters? \ n  -- T
-   max-iterations @ n:= dup if 
+   max-iterations @ = dup if 
       messages @ "too many iterations" a:push drop 
    then ;
 
 defer: criterion?
 defer: algorithm
 
+: should-print?
+   dup print-lines @ mod 0 = ;
+
 : finished \ n x1 -- x1
-   criterion? swap max-iters? or if break then ;
+   dup >r criterion? swap max-iters? or if 
+   r> should-print? not if print-row then drop break then ;
 
 : add-item \ val ix -- val
    over row @ -rot a:! drop ;
 
 : do-it \ i x0 -- x1
-   algorithm print-row finished ;
+   algorithm 
+   should-print? if print-row then 
+   finished ;
+
+: main \ a --
+   print-header
+   ' do-it 0 max-iterations @ loop
+   print-footer 
+   print-messages cr ;
+
+;with
+
 
 
    
