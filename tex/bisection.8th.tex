@@ -27,81 +27,53 @@ You should also consult the documentation of the numerics library.
 \begin{minted}{forth}
 needs tools
 needs numerics
+with: nm
+with: n
 \end{minted}
 We store $f(a)$ to not have to evaluate it twice.
 \begin{minted}{forth}
 var f(a) 
 \end{minted}
 This is a test function: $f(x)=x^3+4x^2-10$. We evaluate it using
-Horner's Schema: $(x+4)x^2-10$.
+Horner's method: $(x+4)x^2-10$.
 \begin{minted}{forth}
 : f-test \ n -- n
-   dup 4 n:+ swap n:sqr n:* 10 n:- ;
+   dup 4 + swap sqr * 10 - ;
 \end{minted}
 Calculate the midpoint between $a$ and $b$ using $p=a+\frac{b-a}{2}$,
 which is safer against overflow than $\frac{a+b}{2}$.
 \begin{minted}{forth}
 : midpoint \ a b -- a+(b-a)/2
-   over n:- 2 n:/ n:+ ; 
-\end{minted}
-Print a row of our data. We have: $n$ iteration counter, $a$ left interval 
-end, $b$ right interval end, $p$ midpoint, $f(p)$ value at midpoint, $|a-b|$
-interval length, if $l>1$, only every l-th line is shown. Note:
-\texttt{print-row} only displays anything if \texttt{num-debug} is true.
-\begin{minted}{forth}
-: print-row \ n a b p f(p) l -- n a b p f(p)
-   nm:num-debug @ if
-      5 pick swap n:mod 0 = if
-         4 #> 4 pick . " " . 
-         3 pick nm:f. " " .
-         2 pick nm:f. " " .
-         1 pick nm:f. " " .
-         0 pick nm:f. " " .
-         3 pick 2 pick n:- n:abs nm:f. 
-         cr 
-      then 
-   else drop then ;
+   tuck - 2 / 4 add-item + ; 
 \end{minted}
 Exit criterion. Returns true iff $f(p)<\epsilon$ or $|b-p|<\epsilon$.
+criterion \ n b p f(p) -- n b p f(p) ?
 \begin{minted}{forth}
-: criterion \ n b p f(p) -- n b p f(p) ?
-   dup 0 nm:eps n:~ >r 
-   -rot 2dup nm:eps n:~ >r rot 
-   2r> or ;
+: bis-criterion \ a b n -- a b n
+   row @ 3 a:@ 0~ swap 4 a:@ 0~ nip or ;
 \end{minted}
 Takes an interval $(a,b)$ and returns a new interval, which is either
 $(a,p)$ or $(p,b)$ depending on which the zero lies in. 
+next-interval \ a b n --  a p | p b
 \begin{minted}{forth}
-: next-interval \ a b n --  a p | p b
-   dup nm:max-iterations @ n:= if ;; then
-   -rot 2dup midpoint dup nm:f \ n a b p f(p)
-   criterion if 
-      1 print-row 
-      break 
-   else
-      nm:print-lines @ print-row
-      f(a) @ over n:* 0 n:> if \ n a b p f(p) f(a)*f(p)>0
-         f(a) ! rot drop swap \ n a b p 
-      else 
-         drop nip \ n a b 
-   then then rot drop ; 
+: bis-algorithm \ a b n -- a p n | p b n
+   >r 
+   1 add-item
+   swap 0 add-item \ b a
+   2dup midpoint 2 add-item \ b a p
+   dup f 3 add-item \ b a p f(p)
+   f(a) @ over \ b a p f(p) f(a) f(p)
+   * 0 > if \ b a p f(p)
+      f(a) ! nip swap
+   else drop rot drop then
+   r> ;
 \end{minted}
 Given an initial interval, that includes at least one zero,
 \texttt{bisection} returns an interval with a zero in it.
 \begin{minted}{forth}
 : bisection \ a b -- a b
-   over nm:f f(a) ! 
-   nm:num-debug @ if
-      "n     a                       b                       p                 "
-      "      f(p)                    |a-b| " s:+ . cr
-      124 draw-line cr
-   then
-   ' next-interval 0 nm:max-iterations @ loop
-   nm:num-debug @ if 124 draw-line cr then
-   nm:max-iterations @ n:= if
-      "ran " . nm:max-iterations @ . 
-      " iterations, but the result was not close enough" . cr 
-   then ;
+   over f f(a) !
+   ["a","b","p","f(p)","|b-a|/2"] main ;
 \end{minted}
 Show the steps
 \begin{minted}{forth}
@@ -109,9 +81,9 @@ true nm:num-debug !
 \end{minted}
 \begin{minted}{forth}
 ' f-test w:is nm:f
-1. 2. bisection .s 2dup nm:f. nm:f. n:- n:abs nm:f. cr
-\end{minted}
-\begin{minted}{forth}
-bye
+' bis-criterion w:is criterion?
+' bis-algorithm w:is algorithm
+F1. 2. bisection f. space f. cr
+;with ;with bye
 \end{minted}
 \end{document}

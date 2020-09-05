@@ -25,10 +25,10 @@ with: n
    2 a:@ 0~ nip or ;
 
 : nwt-algorithm \ x0 n -- x1 n
-   >r 0 add-item 
-   dup dup dup f 2 add-item  
-   swap f' / - 1 add-item
-   2dup - abs 3 add-item drop nip r> ;
+   >r 0 item! 
+   dup dup dup f 2 item!  
+   swap f' / - 1 item!
+   2dup - abs 3 item! drop nip r> ;
 
 : newton \ n -- n
    ["x0","x1","f(x0)","|x1-x0|"] main ;

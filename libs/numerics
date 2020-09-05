@@ -161,8 +161,11 @@ defer: algorithm
    dup >r criterion? swap max-iters? or if 
    r> should-print? not if print-row then drop break then ;
 
-: add-item \ val ix -- val
+: item! \ val ix -- val
    over row @ -rot a:! drop ;
+
+: get-item
+   row @ swap a:@ nip ;
 
 : do-it \ i x0 -- x1
    algorithm 

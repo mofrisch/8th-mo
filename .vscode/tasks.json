@@ -6,7 +6,7 @@
       {
          "label": "run 8th",
          "type": "shell",
-         "command": "8th -f ${relativeFile} ${input:filename} -e bye",
+         "command": "8th -f ${relativeFile} ${input:filename}",
          // "command": "8th -f doc.8th newton.8th",
          "problemMatcher": [
             {

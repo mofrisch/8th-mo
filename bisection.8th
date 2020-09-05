@@ -28,14 +28,14 @@ with: n
 var f(a) 
 
 \ : This is a test function: $f(x)=x^3+4x^2-10$. We evaluate it using
-\ : Horner's Schema: $(x+4)x^2-10$.
+\ : Horner's method: $(x+4)x^2-10$.
 : f-test \ n -- n
    dup 4 + swap sqr * 10 - ;
 
 \ : Calculate the midpoint between $a$ and $b$ using $p=a+\frac{b-a}{2}$,
 \ : which is safer against overflow than $\frac{a+b}{2}$.
 : midpoint \ a b -- a+(b-a)/2
-   tuck - 2 / 4 add-item + ; 
+   tuck - 2 / 4 item! + ; 
 
 \ : Exit criterion. Returns true iff $f(p)<\epsilon$ or $|b-p|<\epsilon$.
 \ : criterion \ n b p f(p) -- n b p f(p) ?
@@ -47,10 +47,10 @@ var f(a)
 \ : next-interval \ a b n --  a p | p b
 : bis-algorithm \ a b n -- a p n | p b n
    >r 
-   1 add-item
-   swap 0 add-item \ b a
-   2dup midpoint 2 add-item \ b a p
-   dup f 3 add-item \ b a p f(p)
+   1 item!
+   swap 0 item! \ b a
+   2dup midpoint 2 item! \ b a p
+   dup f 3 item! \ b a p f(p)
    f(a) @ over \ b a p f(p) f(a) f(p)
    * 0 > if \ b a p f(p)
       f(a) ! nip swap
@@ -67,7 +67,7 @@ var f(a)
 \ : Show the steps
 true nm:num-debug !
 
-\ 10 print-lines !
+10 print-lines !
 \ 40 big-floats
 
 ' f-test w:is nm:f
