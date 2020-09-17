@@ -55,7 +55,7 @@ var f(a)
    * 0 > if \ b a p f(p)
       f(a) ! nip swap
    else drop rot drop then
-   r> ;
+   r> .s ;
 
 
 \ : Given an initial interval, that includes at least one zero,
@@ -75,7 +75,7 @@ true nm:num-debug !
 ' bis-algorithm w:is algorithm
 \ big-floats
 \ 5 max-iterations !
-F1. 2. bisection f. space f. cr
+F1. 2. bisection .s f. space f. cr
 ;with ;with bye
 
 

@@ -22,6 +22,8 @@
 needs tools
 needs numerics
 
+
+
 \ : We store $f(a)$ to not have to evaluate it twice.
 var f(a) 
 
